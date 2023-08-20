@@ -1,0 +1,244 @@
+{\rtf1\ansi\ansicpg936\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 import pyodbc\
+import json\
+import sys\
+import socket\
+import threading\
+import time\
+import os\
+from Utils import Mark,log,Position\
+from AStar import aStarSearch\
+from flask import Flask, request, jsonify\
+mark_list: dict[str, Mark] = \{\}\
+data_list_global = []\
+data_dict_global = \{\}\
+mark_map = \{\}\
+currentmarks = \{\}\
+destcode = None\
+pastmarks = \{\}\
+destmarks = \{\}\
+condition = threading.Condition()\
+app = Flask(__name__)\
+server = 'project-server.database.windows.net'\
+database = 'all'\
+username = 'user123456789'\
+password = 'admin123.'\
+driver = '\{ODBC Driver 17 for SQL Server\}'\
+all_marks: dict[str, Mark] = \{\}\
+mark_map: dict[str, Mark] = \{\}\
+currentmark = None\
+destmarks = \{\}\
+destcodes=\{\}\
+\
+\
+def initialize_all_marks():\
+    global mark_map\
+    global all_marks\
+\
+    try:\
+        current_directory = os.getcwd()\
+\
+        # \uc0\u20174  markers.json \u21152 \u36733  all_marks\
+        markers_filename = os.path.join(current_directory, 'markers.json')\
+        try:\
+            with open(markers_filename, 'r') as file:\
+                all_marks = json.load(file)\
+                print("all_marks:", all_marks)\
+        except FileNotFoundError:\
+            print(f"\uc0\u25991 \u20214  '\{markers_filename\}' \u26410 \u25214 \u21040 \u12290 ")\
+            return 'markers.json \uc0\u26410 \u25214 \u21040 '\
+\
+        # \uc0\u20174  markersmap.json \u21152 \u36733  mark_map\
+        markersmap_filename = os.path.join(current_directory, 'markersmap.json')\
+        try:\
+            with open(markersmap_filename, 'r') as file:\
+                mark_map = json.load(file)\
+                print("mark_map:", mark_map)\
+        except FileNotFoundError:\
+            print(f"\uc0\u25991 \u20214  '\{markersmap_filename\}' \u26410 \u25214 \u21040 \u12290 ")\
+            return 'markersmap.json \uc0\u26410 \u25214 \u21040 '\
+\
+        return 'success'\
+    except Exception as e:\
+        return "initializeerror"+str(e)\
+        \
+def navigation(license) -> list[Mark]:\
+\
+    mark = currentmarks[license]\
+    currentmark=mark_list[mark]\
+    endMark = mark_list[destmarks[license]]\
+    print(mark,currentmark,endMark)\
+    for mark_name in mark_list:\
+        mark_list[mark_name].distanceToDest = mark_list[mark_name].position.distanceTo(endMark)\
+\
+\
+    return aStarSearch(currentmark, endMark)\
+def get_connection():\
+    return pyodbc.connect(f'DRIVER=\{driver\};SERVER=\{server\};DATABASE=\{database\};UID=\{username\};PWD=\{password\}')\
+#note main promramme\
+@app.route('/get_data', methods=['GET','post'])\
+def get_data():\
+    try:\
+        license = request.args.get('license')  # \uc0\u20174 \u35831 \u27714 \u20013 \u33719 \u21462 \u23383 \u31526 \u20018 \u25968 \u25454 \
+        if license == None :\
+            license = "001"\
+        print("Received license:", license)\
+    except Exception as e:\
+        return "erroringettinglicense"\
+    global data_list_global\
+    global data_dict_global\
+    global destcode  # \uc0\u22768 \u26126 \u20351 \u29992 \u20840 \u23616 \u21464 \u37327  destcode\
+    global destmarks\
+    global destcodes\
+    data_list_global=[]\
+    data_dict_globa=\{\}\
+    try:\
+        conn = get_connection()\
+        cursor = conn.cursor()\
+        row=[]\
+        table_name = request.args.get('table')  # \uc0\u33719 \u21462 \u35831 \u27714 \u21442 \u25968 \u20013 \u30340 \u34920 \u21517 \
+        data_list = []  # \uc0\u20026  data_list \u21019 \u24314 \u19968 \u20010 \u31354 \u21015 \u34920 \
+\
+        if table_name == 'E':\
+            query_enter_point = 'SELECT code, mark ,busy FROM enter_point'\
+            query_vehicle_infor = 'SELECT license, vehicle_type, occupation FROM vehicle_infor'\
+            \
+            # \uc0\u33719 \u21462  enter_point \u34920 \u25968 \u25454 \
+            cursor.execute(query_enter_point)\
+            rows_enter_point = cursor.fetchall()\
+            \
+            for row in rows_enter_point:\
+                data_list.append(\{'code': row.code, 'mark': row.mark, 'now':table_name\})\
+\
+            if not rows_enter_point:\
+                return 'lot_full'          # return lotfull when the list is empty\
+            currentmarks[license]="entry"\
+            for row in rows_enter_point :\
+                data_dict_global = \{'code': row.code, 'mark': row.mark\}\
+                data_list_global.append(data_dict_global)\
+\
+        elif table_name == '1':\
+            query = 'SELECT code, mark FROM mark_1 WHERE busy = 0'\
+            currentmarks[license] = "mark_1"\
+        elif table_name == '2':\
+            query = 'SELECT code, mark FROM mark_2 WHERE busy = 0'\
+            currentmarks[license] = "mark_2"\
+        elif table_name == '3':\
+            query = 'SELECT code, mark FROM mark_3 WHERE busy = 0'\
+            currentmarks[license] = "mark_3"\
+        elif table_name == '4':\
+            query = 'SELECT code, mark FROM mark_4 WHERE busy = 0'\
+            currentmarks[license] = "mark_4"\
+        else:\
+            return "unknown mark", 400\
+        if table_name != 'E':  # \uc0\u27492 \u22788 \u28155 \u21152 \u21028 \u26029 \u26465 \u20214 \u65292 \u36991 \u20813 \u22312  'E' \u34920 \u24773 \u20917 \u19979 \u37325 \u22797 \u25191 \u34892 \u26597 \u35810 \
+            cursor.execute(query)\
+            rows = cursor.fetchall()\
+            \
+\
+            for row in rows :\
+                data_dict_global = \{'code': row.code, 'mark': row.mark\}\
+                data_list_global.append(data_dict_global)\
+\
+        # \uc0\u33719 \u21462  'code' \u23545 \u24212 \u30340 \u20540 \
+        print("yourlicenseis"+license)\
+        print(data_list_global[0])\
+        first_element = data_list_global[0]  # \uc0\u33719 \u21462 \u21015 \u34920 \u20013 \u30340 \u31532 \u19968 \u20010 \u23383 \u20856 \
+        extracted_code = first_element.get('code', '')  # \uc0\u33719 \u21462 \u31532 \u19968 \u20010 \u23383 \u20856 \u20013 \u30340  'code' \u38190 \u30340 \u20540 \
+        destcode = extracted_code.strip().replace("'", '')  # \uc0\u22788 \u29702 \u20540 \
+        destcodes[license] = destcode\
+        extracted_mark = first_element.get('mark', '')\
+        destmark = extracted_mark\
+        destmarks[license] = "mark_"+str(destmark)\
+        print("destination is", destmark)\
+        matching_codes = []\
+        if currentmarks[license] == "mark_"+str(destmark) :\
+            matching_codes=[]\
+            matching_codes = [data for data in data_list_global if data.get('mark') == int(table_name)]\
+            print(matching_codes)\
+            return jsonify(matching_codes),200\
+        #print("currentmark",currentmarks[license])\
+        else :\
+            try:\
+                path=navigation(license)\
+                print(str(path))\
+                json_data = json.dumps(path, default=custom_encoder, indent=4)\
+                print(json_data)\
+            except Exception as e:\
+                return "navigaiton"+str(e), 500\
+            return jsonify(json_data), 200\
+\
+    \
+        print("currentmark",currentmarks[license])\
+    \
+        if table_name != 'E':  # \uc0\u27492 \u22788 \u28155 \u21152 \u21028 \u26029 \u26465 \u20214 \u65292 \u36991 \u20813 \u22312  'E' \u34920 \u24773 \u20917 \u19979 \u37325 \u22797 \u25191 \u34892 \u26597 \u35810 \
+            cursor.execute(query)\
+            rows = cursor.fetchall()\
+            \
+            for row in rows:\
+                data_list.append(\{'code': row.code, 'mark': row.mark, 'now':table_name\})\
+        \
+        cursor.close()\
+        conn.close()\
+        \
+    except Exception as e:\
+        return license+str(e), 500\
+\
+@app.route('/update_data', methods=['POST','GET'])\
+def update_sensor():\
+    try:\
+        conn = get_connection()\
+        cursor = conn.cursor()\
+\
+        code_to_update = request.form.get('code')  # \uc0\u33719 \u21462 \u35831 \u27714 \u34920 \u21333 \u20013 \u30340  code \u21442 \u25968 \
+        new_busy_status = request.form.get('busy')  # \uc0\u33719 \u21462 \u35831 \u27714 \u34920 \u21333 \u20013 \u30340  busy \u21442 \u25968 \
+\
+        if code_to_update is None or new_busy_status is None:\
+            return "Missing parameters", 400\
+\
+        # \uc0\u26356 \u26032 \u25152 \u26377 \u34920 \u20013 \u25351 \u23450  code \u23545 \u24212 \u30340  busy \u29366 \u24577 \
+        tables = ['enter_point', 'mark_1', 'mark_2', 'mark_3', 'mark_4']\
+        for table in tables:\
+            query = f"UPDATE \{table\} SET busy = ? WHERE code = ?"\
+            cursor.execute(query, (new_busy_status, code_to_update))\
+            conn.commit()\
+\
+        cursor.close()\
+        conn.close()\
+\
+        return "Data updated successfully", 200\
+    except Exception as e:\
+        return str(e), 500\
+\
+\
+def landMarksInit(all_marks: dict[str, dict[str, float]], mark_map: dict[str, dict[str, float]]):\
+    global mark_list\
+\
+    for mark_name in all_marks:\
+        mark_list[mark_name] = Mark(mark_name, all_marks[mark_name]["x"], all_marks[mark_name]["y"])\
+\
+    for mark_name in mark_list:\
+        mark = mark_list[mark_name]\
+        for neibour_name in mark_map[mark_name]:\
+            mark.neibours[mark_list[neibour_name]] = mark_map[mark_name][neibour_name]\
+        mark_list[mark_name] = mark\
+        \
+def custom_encoder(obj):\
+    if isinstance(obj, Mark):\
+        return \{"name": obj.name, "x": obj.x, "y": obj.y\}\
+    raise TypeError(f"Object of type '\{obj.__class__.__name__\}' is not JSON serializable")\
+\
+\
+if __name__ == '__main__':\
+  \
+    initialize_all_marks()\
+    print(initialize_all_marks())\
+    landMarksInit(all_marks,mark_map)\
+    \
+    app.run(host='0.0.0.0', port=2222)}

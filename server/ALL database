@@ -1,0 +1,205 @@
+CREATE TABLE enter_point(
+    code VARCHAR(10),
+    mark INT,
+    busy BIT
+);
+GO
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('E',2,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('J',2,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('D',2,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('I',2,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('C',2,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('H',2,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('B',1,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('G',1,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('O',4,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('N',4,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('M',4,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('L',3,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('A',1,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('F',1,0);
+INSERT INTO enter_point(code, mark, busy)
+VALUES ('K',3,0);
+SELECT * FROM enter_point
+GO
+CREATE TABLE mark_1(
+    code VARCHAR(10),
+    mark INT,
+    busy BIT
+);
+GO
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('A',1,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('F',1,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('B',1,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('G',1,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('C',1,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('H',1,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('D',2,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('I',2,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('K',3,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('L',3,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('M',3,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('N',4,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('E',2,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('J',2,0);
+INSERT INTO mark_1(code, mark, busy)
+VALUES ('O',4,0);
+SELECT * FROM mark_1
+GO
+CREATE TABLE mark_2(
+    code VARCHAR(10),
+    mark INT,
+    busy BIT
+);
+GO
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('E',2,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('J',2,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('D',2,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('I',2,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('C',2,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('H',2,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('B',1,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('G',1,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('O',4,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('N',4,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('M',4,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('L',3,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('A',1,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('F',1,0);
+INSERT INTO mark_2(code, mark, busy)
+VALUES ('K',3,0);
+SELECT * FROM mark_2
+GO
+CREATE TABLE mark_3(
+    code VARCHAR(10),
+    mark INT,
+    busy BIT
+);
+GO
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('F',3,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('G',3,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('K',3,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('L',3,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('H',3,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('M',3,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('I',4,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('N',4,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('A',1,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('B',1,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('C',2,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('D',2,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('E',2,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('J',2,0);
+INSERT INTO mark_3(code, mark, busy)
+VALUES ('O',4,0);
+SELECT * FROM mark_3
+GO
+CREATE TABLE mark_4(
+    code VARCHAR(10),
+    mark INT,
+    busy BIT
+);
+GO
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('O',4,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('J',4,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('I',4,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('N',4,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('H',4,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('M',4,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('G',3,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('L',3,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('E',2,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('D',2,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('C',2,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('B',1,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('K',3,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('F',3,0);
+INSERT INTO mark_4(code, mark, busy)
+VALUES ('A',1,0);
+SELECT * FROM mark_4
+GO
+CREATE TABLE vehicle_infor (
+    license VARCHAR(20),
+    vehicle_type VARCHAR(50),
+    occupation INT
+);
+GO
+INSERT INTO vehicle_infor(license, vehicle_type, occupation)
+VALUES ('001','taxi',1);
+INSERT INTO vehicle_infor(license, vehicle_type, occupation)
+VALUES ('002','truck',2);
+INSERT INTO vehicle_infor(license, vehicle_type, occupation)
+VALUES ('003','truck',2);
+INSERT INTO vehicle_infor(license, vehicle_type, occupation)
+VALUES ('004','taxi',1);
+SELECT * FROM vehicle_infor;
